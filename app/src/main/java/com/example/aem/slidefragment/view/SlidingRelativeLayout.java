@@ -10,7 +10,7 @@
      */
     public class SlidingRelativeLayout extends RelativeLayout {
 
-        private float yFraction = 0;
+        private float yFraction = 0,xFraction = 0;
 
         public SlidingRelativeLayout(Context context) {
             super(context);
@@ -25,6 +25,7 @@
         }
 
         private ViewTreeObserver.OnPreDrawListener preDrawListener = null;
+        private ViewTreeObserver.OnPreDrawListener preXDrawListener = null;
 
         public void setYFraction(float fraction) {
 
@@ -51,5 +52,35 @@
 
         public float getYFraction() {
             return this.yFraction;
+        }
+
+
+
+
+        public void setXFraction(float fraction) {
+
+            this.xFraction = fraction;
+
+            if (getWidth() == 0) {
+                if (preXDrawListener == null) {
+                    preXDrawListener = new ViewTreeObserver.OnPreDrawListener() {
+                        @Override
+                        public boolean onPreDraw() {
+                            getViewTreeObserver().removeOnPreDrawListener(preXDrawListener);
+                            setXFraction(xFraction);
+                            return true;
+                        }
+                    };
+                    getViewTreeObserver().addOnPreDrawListener(preXDrawListener);
+                }
+                return;
+            }
+
+            float translationX = getWidth() * fraction;
+            setTranslationX(translationX);
+        }
+
+        public float getXFraction() {
+            return this.xFraction;
         }
     }
